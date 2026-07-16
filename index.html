@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <!-- Meta tag fondamentale per i dispositivi mobili: adatta la scala allo schermo -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Soundboard Mobile</title>
+    <style>
+        /* Definizione dei colori e variabili */
+        :root {
+            --bg-color: #121212;
+            --btn-color: #3498db;
+            --btn-active: #2980b9;
+            --text-color: #ffffff;
+        }
+
+        /* Reset e impostazioni di base */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        h1 {
+            margin: 20px 0 30px;
+            font-size: 1.8rem;
+            text-align: center;
+        }
+
+        /* Griglia ottimizzata per mobile: 2 colonne */
+        .soundboard {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            width: 100%;
+            max-width: 500px; /* Evita che diventi troppo largo su tablet */
+        }
+
+        /* Stile dei pulsanti */
+        button {
+            background-color: var(--btn-color);
+            color: var(--text-color);
+            border: none;
+            border-radius: 12px;
+            min-height: 90px; /* Area di tocco molto ampia per le dita */
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: transform 0.1s ease, background-color 0.1s ease;
+            
+            /* Ottimizzazioni specifiche per il touch */
+            touch-action: manipulation; /* Disabilita il ritardo del doppio tap */
+            -webkit-tap-highlight-color: transparent; /* Rimuove l'evidenziazione blu di default su Android/iOS */
+        }
+
+        /* Effetto di pressione "fisica" del pulsante */
+        button:active {
+            transform: scale(0.92);
+            background-color: var(--btn-active);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+        }
+
+        .icon {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Effetti Sonori</h1>
+
+    <div class="soundboard">
+        <!-- L'attributo data-sound contiene il percorso del file audio corrispondente -->
+        <button data-sound="cane.mp3"><span class="icon">🐶</span> cane</button>
+        <button data-sound="clacson.mp3"><span class="icon">🎺</span> clacson</button>
+        <button data-sound="creepy.mp3"><span class="icon">👻</span> creepy</button>
+        <button data-sound="risata.mp3"><span class="icon">😂</span> risata</button>
+        <button data-sound="ruggito.mp3"><span class="icon">🐯</span> ruggito</button>
+        <button data-sound="risata1.mp3"><span class="icon">😂</span> risata 1</button>
+        <button data-sound="suspance.mp3"><span class="icon">👽</span> suspance</button>
+        <button data-sound="urlospaventoso.mp3"><span class="icon">😱</span> urlo spaventoso</button>
+        <button data-sound="vetrorotto.mp3"><span class="icon">💥</span> vetro rotto</button>
+        <button data-sound="urlo.mp3"><span class="icon">😱</span> urlo</button>
+    </div>
+
+    <script>
+        // Variabile globale per memorizzare l'audio attualmente in esecuzione
+        let currentAudio = null;
+
+        // Seleziona tutti i pulsanti all'interno della griglia
+        const buttons = document.querySelectorAll('.soundboard button');
+
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Recupera il nome del file dall'attributo HTML del bottone cliccato
+                const soundFile = button.getAttribute('data-sound');
+                
+                // 1. Se esiste già un audio in riproduzione, fermalo e riportalo all'inizio
+                if (currentAudio) {
+                    currentAudio.pause();
+                    currentAudio.currentTime = 0; 
+                }
+
+                // 2. Crea il nuovo audio e assegnalo alla variabile globale
+                currentAudio = new Audio(soundFile);
+                
+                // 3. Avvia la riproduzione del nuovo suono
+                currentAudio.play().catch(error => {
+                    console.error("Errore nella riproduzione dell'audio:", error);
+                    alert(`Impossibile riprodurre ${soundFile}. Assicurati che il file esista nella stessa cartella.`);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
