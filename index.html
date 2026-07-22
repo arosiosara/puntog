@@ -29,47 +29,48 @@
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            padding: 20px;
+            padding: 15px 10px;
         }
 
         h1 {
-            margin: 20px 0 30px;
-            font-size: 1.8rem;
+            margin: 15px 0 20px;
+            font-size: 1.6rem;
             text-align: center;
         }
 
-        /* Griglia ottimizzata per mobile: 2 colonne */
+        /* Griglia impostata su 3 colonne (3 per riga x 5 righe = 15 bottoni) */
         .soundboard {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px; /* Spaziatura ridotta per far stare meglio 3 colonne */
             width: 100%;
-            max-width: 500px; /* Evita che diventi troppo largo su tablet */
+            max-width: 500px;
         }
 
-        /* Stile dei pulsanti */
+        /* Stile dei pulsanti rimpiccioliti per la nuova griglia */
         button {
             background-color: var(--btn-color);
             color: var(--text-color);
             border: none;
-            border-radius: 12px;
-            min-height: 90px; /* Area di tocco molto ampia per le dita */
-            font-size: 1.1rem;
+            border-radius: 10px;
+            min-height: 75px; /* Altezza ridotta per proporzionare le 5 file */
+            padding: 6px 4px;
+            font-size: 0.85rem; /* Font leggermente più piccolo per evitare testo a capo antiestetico */
             font-weight: 600;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
             transition: transform 0.1s ease, background-color 0.1s ease;
             
-            /* Ottimizzazioni specifiche per il touch */
-            touch-action: manipulation; /* Disabilita il ritardo del doppio tap */
-            -webkit-tap-highlight-color: transparent; /* Rimuove l'evidenziazione blu di default su Android/iOS */
+            /* Ottimizzazioni touch */
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* Effetto di pressione "fisica" del pulsante */
+        /* Effetto di pressione del pulsante */
         button:active {
             transform: scale(0.92);
             background-color: var(--btn-active);
@@ -77,8 +78,8 @@
         }
 
         .icon {
-            font-size: 1.8rem;
-            margin-bottom: 5px;
+            font-size: 1.4rem; /* Icona ridotta per bilanciare l'altezza */
+            margin-bottom: 4px;
         }
     </style>
 </head>
@@ -87,7 +88,7 @@
     <h1>Effetti Sonori</h1>
 
     <div class="soundboard">
-        <!-- L'attributo data-sound contiene il percorso del file audio corrispondente -->
+        <!-- 15 pulsanti disposti su 3 colonne x 5 righe -->
         <button data-sound="cane.mp3"><span class="icon">🐶</span>cane</button>
         <button data-sound="clacson.mp3"><span class="icon">🎺</span>clacson</button>
         <button data-sound="creepy.mp3"><span class="icon">👻</span>creepy</button>
@@ -106,27 +107,21 @@
     </div>
 
     <script>
-        // Variabile globale per memorizzare l'audio attualmente in esecuzione
         let currentAudio = null;
 
-        // Seleziona tutti i pulsanti all'interno della griglia
         const buttons = document.querySelectorAll('.soundboard button');
 
         buttons.forEach(button => {
             button.addEventListener('click', () => {
-                // Recupera il nome del file dall'attributo HTML del bottone cliccato
                 const soundFile = button.getAttribute('data-sound');
                 
-                // 1. Se esiste già un audio in riproduzione, fermalo e riportalo all'inizio
                 if (currentAudio) {
                     currentAudio.pause();
                     currentAudio.currentTime = 0; 
                 }
 
-                // 2. Crea il nuovo audio e assegnalo alla variabile globale
                 currentAudio = new Audio(soundFile);
                 
-                // 3. Avvia la riproduzione del nuovo suono
                 currentAudio.play().catch(error => {
                     console.error("Errore nella riproduzione dell'audio:", error);
                     alert(`Impossibile riprodurre ${soundFile}. Assicurati che il file esista nella stessa cartella.`);
