@@ -183,7 +183,7 @@
 
     <header>
         <h1>Effetti Sonori</h1>
-        <p class="subtitle">Formati supportati: MP3, WAV, OGG, M4A, AAC</p>
+        <p class="subtitle">Formati: MP3, OPUS (WhatsApp), WAV, OGG, M4A, AAC</p>
         
         <div class="action-bar">
             <!-- Pulsante per inserire nuovi file audio -->
@@ -192,8 +192,8 @@
             <button id="deleteModeBtn" class="btn-action btn-delete">🗑️ Elimina</button>
         </div>
 
-        <!-- Input file nascosto filtrato per i formati audio -->
-        <input type="file" id="fileInput" accept="audio/mp3, audio/mpeg, audio/wav, audio/ogg, audio/aac, audio/m4a, audio/webm, audio/*" multiple style="display: none;">
+        <!-- Input file nascosto con supporto a .opus e audio WhatsApp -->
+        <input type="file" id="fileInput" accept="audio/*, .opus, .m4a, .ogg, .wav, .mp3, .aac, .webm" multiple style="display: none;">
     </header>
 
     <div class="soundboard" id="soundboard">
@@ -218,7 +218,7 @@
     <script>
         let currentAudio = null;
         let currentButton = null;
-        let isDeleteMode = false; // Stato della modalità eliminazione
+        let isDeleteMode = false;
 
         const soundboard = document.getElementById('soundboard');
         const addBtn = document.getElementById('addBtn');
@@ -245,18 +245,15 @@
 
             // --- GESTIONE ELIMINAZIONE PULSANTE ---
             if (isDeleteMode) {
-                // Se il pulsante che si sta eliminando stava suonando, ferma l'audio
                 if (currentButton === button) {
                     stopCurrentAudio();
                 }
 
-                // Libera la memoria se era un file aggiunto localmente
                 const soundSrc = button.getAttribute('data-sound');
                 if (soundSrc && soundSrc.startsWith('blob:')) {
                     URL.revokeObjectURL(soundSrc);
                 }
 
-                // Rimuove il pulsante dal DOM
                 button.remove();
                 return;
             }
@@ -281,7 +278,7 @@
 
             currentAudio.play().catch(error => {
                 console.error("Errore nella riproduzione dell'audio:", error);
-                alert(`Impossibile riprodurre il file audio. Assicurati che sia in un formato supportato (MP3, WAV, OGG, M4A).`);
+                alert(`Impossibile riprodurre il file audio. Assicurati che sia in un formato supportato dal tuo browser (MP3, OPUS, WAV, OGG, M4A).`);
                 stopCurrentAudio();
             });
 
@@ -308,7 +305,6 @@
 
         // Click sul pulsante "Inserisci Audio"
         addBtn.addEventListener('click', () => {
-            // Disattiva la modalità eliminazione se attiva prima di inserire nuovi file
             if (isDeleteMode) {
                 deleteModeBtn.click();
             }
@@ -321,9 +317,12 @@
             if (!files.length) return;
 
             Array.from(files).forEach(file => {
-                // Verifica basica del tipo di file (deve essere un tipo audio)
-                if (!file.type.startsWith('audio/') && !file.name.match(/\.(mp3|wav|ogg|m4a|aac|webm|flac)$/i)) {
-                    alert(`Il file "${file.name}" non sembra un formato audio valido (MP3, WAV, OGG, M4A, etc.).`);
+                // Controllo estensione (include .opus per WhatsApp) e tipo MIME
+                const isValidAudio = file.type.startsWith('audio/') || 
+                                     file.name.match(/\.(mp3|wav|ogg|m4a|aac|webm|flac|opus)$/i);
+
+                if (!isValidAudio) {
+                    alert(`Il file "${file.name}" non sembra un formato audio supportato.`);
                     return;
                 }
 
@@ -335,7 +334,9 @@
 
                 const iconSpan = document.createElement('span');
                 iconSpan.className = 'icon';
-                iconSpan.textContent = '🎵';
+                
+                // Se è un file di WhatsApp usa un'icona dedicata, altrimenti la nota musicale
+                iconSpan.textContent = file.name.toLowerCase().endsWith('.opus') ? '🎙️' : '🎵';
 
                 newButton.appendChild(iconSpan);
                 newButton.appendChild(document.createTextNode(fileName.toLowerCase()));
