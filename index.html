@@ -14,6 +14,8 @@
             --btn-playing: #e74c3c; /* Colore rosso quando l'audio è in esecuzione */
             --btn-add-color: #2ecc71;
             --btn-add-active: #27ae60;
+            --btn-delete-color: #e67e22;
+            --btn-delete-active: #d35400;
             --text-color: #ffffff;
         }
 
@@ -45,33 +47,70 @@
         }
 
         h1 {
-            margin-bottom: 12px;
+            margin-bottom: 5px;
             font-size: 1.6rem;
             text-align: center;
         }
 
-        /* Pulsante Inserisci */
-        .btn-add {
-            background-color: var(--btn-add-color);
-            color: var(--text-color);
+        .subtitle {
+            font-size: 0.8rem;
+            color: #aaa;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        /* Contenitore pulsanti d'azione (Inserisci ed Elimina) */
+        .action-bar {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn-action {
             border: none;
             border-radius: 20px;
-            padding: 10px 20px;
-            font-size: 0.95rem;
+            padding: 10px 16px;
+            font-size: 0.9rem;
             font-weight: bold;
+            color: var(--text-color);
             cursor: pointer;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
             display: flex;
             align-items: center;
-            gap: 8px;
-            transition: transform 0.1s ease, background-color 0.1s ease;
+            gap: 6px;
+            transition: transform 0.1s ease, background-color 0.2s ease, box-shadow 0.2s ease;
             touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
         }
 
+        .btn-add {
+            background-color: var(--btn-add-color);
+        }
         .btn-add:active {
-            transform: scale(0.95);
             background-color: var(--btn-add-active);
+            transform: scale(0.95);
+        }
+
+        .btn-delete {
+            background-color: var(--btn-delete-color);
+        }
+        .btn-delete:active {
+            background-color: var(--btn-delete-active);
+            transform: scale(0.95);
+        }
+
+        /* Stile pulsante Elimina quando la modalità è ATTIVA */
+        .btn-delete.active {
+            background-color: #c0392b;
+            box-shadow: 0 0 10px rgba(231, 76, 60, 0.8);
+            animation: pulse 1.2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
         }
 
         /* Griglia impostata su 3 colonne */
@@ -85,6 +124,7 @@
 
         /* Stile dei pulsanti audio */
         .soundboard button {
+            position: relative;
             background-color: var(--btn-color);
             color: var(--text-color);
             border: none;
@@ -119,6 +159,20 @@
             box-shadow: 0 0 12px rgba(231, 76, 60, 0.7);
         }
 
+        /* Stile pulsanti durante la Modalità Eliminazione */
+        .soundboard.delete-mode button {
+            border: 2px dashed #e74c3c;
+            opacity: 0.85;
+        }
+
+        .soundboard.delete-mode button::after {
+            content: '❌';
+            position: absolute;
+            top: 4px;
+            right: 6px;
+            font-size: 0.75rem;
+        }
+
         .icon {
             font-size: 1.4rem;
             margin-bottom: 4px;
@@ -129,10 +183,17 @@
 
     <header>
         <h1>Effetti Sonori</h1>
-        <!-- Pulsante per inserire nuovi file audio -->
-        <button id="addBtn" class="btn-add">➕ Inserisci Audio</button>
-        <!-- Input file nascosto -->
-        <input type="file" id="fileInput" accept="audio/*" multiple style="display: none;">
+        <p class="subtitle">Formati supportati: MP3, WAV, OGG, M4A, AAC</p>
+        
+        <div class="action-bar">
+            <!-- Pulsante per inserire nuovi file audio -->
+            <button id="addBtn" class="btn-action btn-add">➕ Inserisci Audio</button>
+            <!-- Pulsante per attivare/disattivare la modalità eliminazione -->
+            <button id="deleteModeBtn" class="btn-action btn-delete">🗑️ Elimina</button>
+        </div>
+
+        <!-- Input file nascosto filtrato per i formati audio -->
+        <input type="file" id="fileInput" accept="audio/mp3, audio/mpeg, audio/wav, audio/ogg, audio/aac, audio/m4a, audio/webm, audio/*" multiple style="display: none;">
     </header>
 
     <div class="soundboard" id="soundboard">
@@ -157,9 +218,11 @@
     <script>
         let currentAudio = null;
         let currentButton = null;
+        let isDeleteMode = false; // Stato della modalità eliminazione
 
         const soundboard = document.getElementById('soundboard');
         const addBtn = document.getElementById('addBtn');
+        const deleteModeBtn = document.getElementById('deleteModeBtn');
         const fileInput = document.getElementById('fileInput');
 
         // Reset dello stato audio e dello stile del pulsante attivo
@@ -180,6 +243,25 @@
             const button = event.target.closest('button');
             if (!button) return;
 
+            // --- GESTIONE ELIMINAZIONE PULSANTE ---
+            if (isDeleteMode) {
+                // Se il pulsante che si sta eliminando stava suonando, ferma l'audio
+                if (currentButton === button) {
+                    stopCurrentAudio();
+                }
+
+                // Libera la memoria se era un file aggiunto localmente
+                const soundSrc = button.getAttribute('data-sound');
+                if (soundSrc && soundSrc.startsWith('blob:')) {
+                    URL.revokeObjectURL(soundSrc);
+                }
+
+                // Rimuove il pulsante dal DOM
+                button.remove();
+                return;
+            }
+
+            // --- GESTIONE RIPRODUZIONE AUDIO ---
             const soundSrc = button.getAttribute('data-sound');
             if (!soundSrc) return;
 
@@ -189,37 +271,62 @@
                 return;
             }
 
-            // 2. Se c'era un altro audio attivo -> fermalo prima di far partire il nuovo
+            // 2. Se c'era un altro audio attivo -> fermalo
             stopCurrentAudio();
 
-            // 3. Avvia il nuovo audio e imposta lo stato
+            // 3. Avvia il nuovo audio
             currentAudio = new Audio(soundSrc);
             currentButton = button;
             button.classList.add('playing');
 
             currentAudio.play().catch(error => {
                 console.error("Errore nella riproduzione dell'audio:", error);
-                alert(`Impossibile riprodurre l'audio.`);
+                alert(`Impossibile riprodurre il file audio. Assicurati che sia in un formato supportato (MP3, WAV, OGG, M4A).`);
                 stopCurrentAudio();
             });
 
-            // 4. Quando l'effetto finisce da solo, rimuovi l'evidenziazione e resetta
+            // 4. Reset alla fine della riproduzione
             currentAudio.onended = () => {
                 stopCurrentAudio();
             };
         });
 
+        // Toggle della Modalità Eliminazione
+        deleteModeBtn.addEventListener('click', () => {
+            isDeleteMode = !isDeleteMode;
+
+            if (isDeleteMode) {
+                deleteModeBtn.classList.add('active');
+                deleteModeBtn.textContent = '✅ Fatto';
+                soundboard.classList.add('delete-mode');
+            } else {
+                deleteModeBtn.classList.remove('active');
+                deleteModeBtn.textContent = '🗑️ Elimina';
+                soundboard.classList.remove('delete-mode');
+            }
+        });
+
         // Click sul pulsante "Inserisci Audio"
         addBtn.addEventListener('click', () => {
+            // Disattiva la modalità eliminazione se attiva prima di inserire nuovi file
+            if (isDeleteMode) {
+                deleteModeBtn.click();
+            }
             fileInput.click();
         });
 
-        // Gestione dei nuovi file caricati dall'utente
+        // Gestione dell'inserimento dei nuovi file audio
         fileInput.addEventListener('change', (event) => {
             const files = event.target.files;
             if (!files.length) return;
 
             Array.from(files).forEach(file => {
+                // Verifica basica del tipo di file (deve essere un tipo audio)
+                if (!file.type.startsWith('audio/') && !file.name.match(/\.(mp3|wav|ogg|m4a|aac|webm|flac)$/i)) {
+                    alert(`Il file "${file.name}" non sembra un formato audio valido (MP3, WAV, OGG, M4A, etc.).`);
+                    return;
+                }
+
                 const audioUrl = URL.createObjectURL(file);
                 const fileName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
 
