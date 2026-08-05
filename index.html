@@ -11,6 +11,9 @@
             --bg-color: #121212;
             --btn-color: #3498db;
             --btn-active: #2980b9;
+            --btn-playing: #e74c3c; /* Colore rosso quando l'audio è in esecuzione */
+            --btn-add-color: #2ecc71;
+            --btn-add-active: #27ae60;
             --text-color: #ffffff;
         }
 
@@ -32,30 +35,63 @@
             padding: 15px 10px;
         }
 
-        h1 {
-            margin: 15px 0 20px;
-            font-size: 1.6rem;
-            text-align: center;
-        }
-
-        /* Griglia impostata su 3 colonne (3 per riga x 5 righe = 15 bottoni) */
-        .soundboard {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px; /* Spaziatura ridotta per far stare meglio 3 colonne */
+        header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
             width: 100%;
             max-width: 500px;
         }
 
-        /* Stile dei pulsanti rimpiccioliti per la nuova griglia */
-        button {
+        h1 {
+            margin-bottom: 12px;
+            font-size: 1.6rem;
+            text-align: center;
+        }
+
+        /* Pulsante Inserisci */
+        .btn-add {
+            background-color: var(--btn-add-color);
+            color: var(--text-color);
+            border: none;
+            border-radius: 20px;
+            padding: 10px 20px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.1s ease, background-color 0.1s ease;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn-add:active {
+            transform: scale(0.95);
+            background-color: var(--btn-add-active);
+        }
+
+        /* Griglia impostata su 3 colonne */
+        .soundboard {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        /* Stile dei pulsanti audio */
+        .soundboard button {
             background-color: var(--btn-color);
             color: var(--text-color);
             border: none;
             border-radius: 10px;
-            min-height: 75px; /* Altezza ridotta per proporzionare le 5 file */
+            min-height: 75px;
             padding: 6px 4px;
-            font-size: 0.85rem; /* Font leggermente più piccolo per evitare testo a capo antiestetico */
+            font-size: 0.85rem;
             font-weight: 600;
             display: flex;
             flex-direction: column;
@@ -63,7 +99,7 @@
             justify-content: center;
             cursor: pointer;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-            transition: transform 0.1s ease, background-color 0.1s ease;
+            transition: transform 0.1s ease, background-color 0.2s ease, box-shadow 0.2s ease;
             
             /* Ottimizzazioni touch */
             touch-action: manipulation;
@@ -71,24 +107,36 @@
         }
 
         /* Effetto di pressione del pulsante */
-        button:active {
+        .soundboard button:active {
             transform: scale(0.92);
             background-color: var(--btn-active);
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
         }
 
+        /* Stato pulsante in riproduzione */
+        .soundboard button.playing {
+            background-color: var(--btn-playing);
+            box-shadow: 0 0 12px rgba(231, 76, 60, 0.7);
+        }
+
         .icon {
-            font-size: 1.4rem; /* Icona ridotta per bilanciare l'altezza */
+            font-size: 1.4rem;
             margin-bottom: 4px;
         }
     </style>
 </head>
 <body>
 
-    <h1>Effetti Sonori</h1>
+    <header>
+        <h1>Effetti Sonori</h1>
+        <!-- Pulsante per inserire nuovi file audio -->
+        <button id="addBtn" class="btn-add">➕ Inserisci Audio</button>
+        <!-- Input file nascosto -->
+        <input type="file" id="fileInput" accept="audio/*" multiple style="display: none;">
+    </header>
 
-    <div class="soundboard">
-        <!-- 15 pulsanti disposti su 3 colonne x 5 righe -->
+    <div class="soundboard" id="soundboard">
+        <!-- 15 pulsanti predefiniti disposti su 3 colonne x 5 righe -->
         <button data-sound="cane.mp3"><span class="icon">🐶</span>cane</button>
         <button data-sound="clacson.mp3"><span class="icon">🎺</span>clacson</button>
         <button data-sound="creepy.mp3"><span class="icon">👻</span>creepy</button>
@@ -99,34 +147,96 @@
         <button data-sound="suspance.mp3"><span class="icon">👽</span>suspance</button>
         <button data-sound="vetrorotto.mp3"><span class="icon">💥</span>vetro rotto</button>
         <button data-sound="urlo.mp3"><span class="icon">😱</span>urlo</button>
-        <button data-sound="pier.mp3"><span class="icon">😄</span>pier</button>
-        <button data-sound="elefante.mp3"><span class="icon">🐘</span>elefante</button>
-        <button data-sound="painto.mp3"><span class="icon">😭</span>pianto</button>
-        <button data-sound="tosse.mp3"><span class="icon">😮‍💨</span>tosse</button>
-        <button data-sound="countdown.mp3"><span class="icon">🔢</span>countdown</button>
+        <button data-sound="pier.mp3"><span class="icon">🚨</span>pier</button>
+        <button data-sound="elefante.mp3"><span class="icon">🥁</span>elefante</button>
+        <button data-sound="painto.mp3"><span class="icon">👽</span>pianto</button>
+        <button data-sound="tosse.mp3"><span class="icon">💥</span>tosse</button>
+        <button data-sound="coutdown.mp3"><span class="icon">😱</span>countdown</button>
     </div>
 
     <script>
         let currentAudio = null;
+        let currentButton = null;
 
-        const buttons = document.querySelectorAll('.soundboard button');
+        const soundboard = document.getElementById('soundboard');
+        const addBtn = document.getElementById('addBtn');
+        const fileInput = document.getElementById('fileInput');
 
-        buttons.forEach(button => {
-            button.addEventListener('click', () => {
-                const soundFile = button.getAttribute('data-sound');
-                
-                if (currentAudio) {
-                    currentAudio.pause();
-                    currentAudio.currentTime = 0; 
-                }
+        // Reset dello stato audio e dello stile del pulsante attivo
+        function stopCurrentAudio() {
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+            }
+            if (currentButton) {
+                currentButton.classList.remove('playing');
+            }
+            currentAudio = null;
+            currentButton = null;
+        }
 
-                currentAudio = new Audio(soundFile);
-                
-                currentAudio.play().catch(error => {
-                    console.error("Errore nella riproduzione dell'audio:", error);
-                    alert(`Impossibile riprodurre ${soundFile}. Assicurati che il file esista nella stessa cartella.`);
-                });
+        // Delegazione degli eventi di click sulla soundboard
+        soundboard.addEventListener('click', (event) => {
+            const button = event.target.closest('button');
+            if (!button) return;
+
+            const soundSrc = button.getAttribute('data-sound');
+            if (!soundSrc) return;
+
+            // 1. Se lo STESSO pulsante viene premuto mentre è in riproduzione -> FERMA l'audio
+            if (currentButton === button && currentAudio && !currentAudio.paused) {
+                stopCurrentAudio();
+                return;
+            }
+
+            // 2. Se c'era un altro audio attivo -> fermalo prima di far partire il nuovo
+            stopCurrentAudio();
+
+            // 3. Avvia il nuovo audio e imposta lo stato
+            currentAudio = new Audio(soundSrc);
+            currentButton = button;
+            button.classList.add('playing');
+
+            currentAudio.play().catch(error => {
+                console.error("Errore nella riproduzione dell'audio:", error);
+                alert(`Impossibile riprodurre l'audio.`);
+                stopCurrentAudio();
             });
+
+            // 4. Quando l'effetto finisce da solo, rimuovi l'evidenziazione e resetta
+            currentAudio.onended = () => {
+                stopCurrentAudio();
+            };
+        });
+
+        // Click sul pulsante "Inserisci Audio"
+        addBtn.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        // Gestione dei nuovi file caricati dall'utente
+        fileInput.addEventListener('change', (event) => {
+            const files = event.target.files;
+            if (!files.length) return;
+
+            Array.from(files).forEach(file => {
+                const audioUrl = URL.createObjectURL(file);
+                const fileName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+
+                const newButton = document.createElement('button');
+                newButton.setAttribute('data-sound', audioUrl);
+
+                const iconSpan = document.createElement('span');
+                iconSpan.className = 'icon';
+                iconSpan.textContent = '🎵';
+
+                newButton.appendChild(iconSpan);
+                newButton.appendChild(document.createTextNode(fileName.toLowerCase()));
+
+                soundboard.appendChild(newButton);
+            });
+
+            fileInput.value = '';
         });
     </script>
 </body>
