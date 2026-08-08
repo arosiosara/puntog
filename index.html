@@ -1,351 +1,450 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <!-- Meta tag fondamentale per i dispositivi mobili: adatta la scala allo schermo -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Soundboard Mobile</title>
-    <style>
-        /* Definizione dei colori e variabili */
-        :root {
-            --bg-color: #121212;
-            --btn-color: #3498db;
-            --btn-active: #2980b9;
-            --btn-playing: #e74c3c; /* Colore rosso quando l'audio è in esecuzione */
-            --btn-add-color: #2ecc71;
-            --btn-add-active: #27ae60;
-            --btn-delete-color: #e67e22;
-            --btn-delete-active: #d35400;
-            --text-color: #ffffff;
-        }
+   <meta charset="UTF-8">
+   <!-- Meta tag fondamentale per i dispositivi mobili: adatta la scala allo schermo -->
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+   <title>Soundboard Mobile</title>
+   <style>
+       /* Definizione dei colori e variabili */
+       :root {
+           --bg-color: #121212;
+           --btn-color: #3498db;
+           --btn-active: #2980b9;
+           --btn-playing: #e74c3c; /* Colore rosso quando l'audio è in esecuzione */
+           --btn-add-color: #2ecc71;
+           --btn-add-active: #27ae60;
+           --btn-delete-color: #e67e22;
+           --btn-delete-active: #d35400;
+           --text-color: #ffffff;
+       }
 
-        /* Reset e impostazioni di base */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
+       /* Reset e impostazioni di base */
+       * {
+           box-sizing: border-box;
+           margin: 0;
+           padding: 0;
+           font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+       }
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            padding: 15px 10px;
-        }
+       body {
+           background-color: var(--bg-color);
+           color: var(--text-color);
+           display: flex;
+           flex-direction: column;
+           align-items: center;
+           min-height: 100vh;
+           padding: 15px 10px;
+       }
 
-        header {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 20px;
-            width: 100%;
-            max-width: 500px;
-        }
+       header {
+           display: flex;
+           flex-direction: column;
+           align-items: center;
+           margin-bottom: 20px;
+           width: 100%;
+           max-width: 500px;
+       }
 
-        h1 {
-            margin-bottom: 5px;
-            font-size: 1.6rem;
-            text-align: center;
-        }
+       h1 {
+           margin-bottom: 5px;
+           font-size: 1.6rem;
+           text-align: center;
+       }
 
-        .subtitle {
-            font-size: 0.8rem;
-            color: #aaa;
-            margin-bottom: 15px;
-            text-align: center;
-        }
+       .subtitle {
+           font-size: 0.8rem;
+           color: #aaa;
+           margin-bottom: 15px;
+           text-align: center;
+       }
 
-        /* Contenitore pulsanti d'azione (Inserisci ed Elimina) */
-        .action-bar {
-            display: flex;
-            gap: 10px;
-            width: 100%;
-            justify-content: center;
-        }
+       /* Contenitore pulsanti d'azione (Inserisci ed Elimina) */
+       .action-bar {
+           display: flex;
+           gap: 10px;
+           width: 100%;
+           justify-content: center;
+       }
 
-        .btn-action {
-            border: none;
-            border-radius: 20px;
-            padding: 10px 16px;
-            font-size: 0.9rem;
-            font-weight: bold;
-            color: var(--text-color);
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: transform 0.1s ease, background-color 0.2s ease, box-shadow 0.2s ease;
-            touch-action: manipulation;
-            -webkit-tap-highlight-color: transparent;
-        }
+       .btn-action {
+           border: none;
+           border-radius: 20px;
+           padding: 10px 16px;
+           font-size: 0.9rem;
+           font-weight: bold;
+           color: var(--text-color);
+           cursor: pointer;
+           box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+           display: flex;
+           align-items: center;
+           gap: 6px;
+           transition: transform 0.1s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+           touch-action: manipulation;
+           -webkit-tap-highlight-color: transparent;
+       }
 
-        .btn-add {
-            background-color: var(--btn-add-color);
-        }
-        .btn-add:active {
-            background-color: var(--btn-add-active);
-            transform: scale(0.95);
-        }
+       .btn-add {
+           background-color: var(--btn-add-color);
+       }
+       .btn-add:active {
+           background-color: var(--btn-add-active);
+           transform: scale(0.95);
+       }
 
-        .btn-delete {
-            background-color: var(--btn-delete-color);
-        }
-        .btn-delete:active {
-            background-color: var(--btn-delete-active);
-            transform: scale(0.95);
-        }
+       .btn-delete {
+           background-color: var(--btn-delete-color);
+       }
+       .btn-delete:active {
+           background-color: var(--btn-delete-active);
+           transform: scale(0.95);
+       }
 
-        /* Stile pulsante Elimina quando la modalità è ATTIVA */
-        .btn-delete.active {
-            background-color: #c0392b;
-            box-shadow: 0 0 10px rgba(231, 76, 60, 0.8);
-            animation: pulse 1.2s infinite;
-        }
+       /* Stile pulsante Elimina quando la modalità è ATTIVA */
+       .btn-delete.active {
+           background-color: #c0392b;
+           box-shadow: 0 0 10px rgba(231, 76, 60, 0.8);
+           animation: pulse 1.2s infinite;
+       }
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.03); }
-            100% { transform: scale(1); }
-        }
+       @keyframes pulse {
+           0% { transform: scale(1); }
+           50% { transform: scale(1.03); }
+           100% { transform: scale(1); }
+       }
 
-        /* Griglia impostata su 3 colonne */
-        .soundboard {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            width: 100%;
-            max-width: 500px;
-        }
+       /* Griglia impostata su 3 colonne */
+       .soundboard {
+           display: grid;
+           grid-template-columns: repeat(3, 1fr);
+           gap: 10px;
+           width: 100%;
+           max-width: 500px;
+       }
 
-        /* Stile dei pulsanti audio */
-        .soundboard button {
-            position: relative;
-            background-color: var(--btn-color);
-            color: var(--text-color);
-            border: none;
-            border-radius: 10px;
-            min-height: 75px;
-            padding: 6px 4px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-            transition: transform 0.1s ease, background-color 0.2s ease, box-shadow 0.2s ease;
-            
-            /* Ottimizzazioni touch */
-            touch-action: manipulation;
-            -webkit-tap-highlight-color: transparent;
-        }
+       /* Stile dei pulsanti audio */
+       .soundboard button {
+           position: relative;
+           background-color: var(--btn-color);
+           color: var(--text-color);
+           border: none;
+           border-radius: 10px;
+           min-height: 75px;
+           padding: 6px 4px;
+           font-size: 0.85rem;
+           font-weight: 600;
+           display: flex;
+           flex-direction: column;
+           align-items: center;
+           justify-content: center;
+           cursor: pointer;
+           box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+           transition: transform 0.1s ease, background-color 0.2s ease, box-shadow 0.2s ease;
 
-        /* Effetto di pressione del pulsante */
-        .soundboard button:active {
-            transform: scale(0.92);
-            background-color: var(--btn-active);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
-        }
+           /* Ottimizzazioni touch */
+           touch-action: manipulation;
+           -webkit-tap-highlight-color: transparent;
+       }
 
-        /* Stato pulsante in riproduzione */
-        .soundboard button.playing {
-            background-color: var(--btn-playing);
-            box-shadow: 0 0 12px rgba(231, 76, 60, 0.7);
-        }
+       /* Effetto di pressione del pulsante */
+       .soundboard button:active {
+           transform: scale(0.92);
+           background-color: var(--btn-active);
+           box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+       }
 
-        /* Stile pulsanti durante la Modalità Eliminazione */
-        .soundboard.delete-mode button {
-            border: 2px dashed #e74c3c;
-            opacity: 0.85;
-        }
+       /* Stato pulsante in riproduzione */
+       .soundboard button.playing {
+           background-color: var(--btn-playing);
+           box-shadow: 0 0 12px rgba(231, 76, 60, 0.7);
+       }
 
-        .soundboard.delete-mode button::after {
-            content: '❌';
-            position: absolute;
-            top: 4px;
-            right: 6px;
-            font-size: 0.75rem;
-        }
+       /* Stile pulsanti durante la Modalità Eliminazione */
+       .soundboard.delete-mode button {
+           border: 2px dashed #e74c3c;
+           opacity: 0.85;
+       }
 
-        .icon {
-            font-size: 1.4rem;
-            margin-bottom: 4px;
-        }
-    </style>
+       .soundboard.delete-mode button::after {
+           content: '❌';
+           position: absolute;
+           top: 4px;
+           right: 6px;
+           font-size: 0.75rem;
+       }
+
+       .icon {
+           font-size: 1.4rem;
+           margin-bottom: 4px;
+       }
+   </style>
 </head>
 <body>
 
-    <header>
-        <h1>Effetti Sonori</h1>
-        <p class="subtitle">Formati: MP3, OPUS (WhatsApp), WAV, OGG, M4A, AAC</p>
-        
-        <div class="action-bar">
-            <!-- Pulsante per inserire nuovi file audio -->
-            <button id="addBtn" class="btn-action btn-add">➕ Inserisci Audio</button>
-            <!-- Pulsante per attivare/disattivare la modalità eliminazione -->
-            <button id="deleteModeBtn" class="btn-action btn-delete">🗑️ Elimina</button>
-        </div>
+   <header>
+       <h1>Effetti Sonori</h1>
+       <p class="subtitle">Formati: MP3, OPUS (WhatsApp), WAV, OGG, M4A, AAC</p>
 
-        <!-- Input file nascosto con supporto a .opus e audio WhatsApp -->
-        <input type="file" id="fileInput" accept="audio/*, .opus, .m4a, .ogg, .wav, .mp3, .aac, .webm" multiple style="display: none;">
-    </header>
+       <div class="action-bar">
+           <!-- Pulsante per inserire nuovi file audio -->
+           <button id="addBtn" class="btn-action btn-add">➕ Inserisci Audio</button>
+           <!-- Pulsante per attivare/disattivare la modalità eliminazione -->
+           <button id="deleteModeBtn" class="btn-action btn-delete">🗑️ Elimina</button>
+       </div>
 
-    <div class="soundboard" id="soundboard">
-        <!-- 15 pulsanti predefiniti disposti su 3 colonne x 5 righe -->
-        <button data-sound="cane.mp3"><span class="icon">🐶</span>cane</button>
-        <button data-sound="clacson.mp3"><span class="icon">🎺</span>clacson</button>
-        <button data-sound="creepy.mp3"><span class="icon">👻</span>creepy</button>
-        <button data-sound="risata.mp3"><span class="icon">😂</span>risata</button>
-        <button data-sound="ruggito.mp3"><span class="icon">🐯</span>ruggito</button>
-        <button data-sound="sirena.mp3"><span class="icon">🚨</span>sirena</button>
-        <button data-sound="tamburi.mp3"><span class="icon">🥁</span>tamburi</button>
-        <button data-sound="suspance.mp3"><span class="icon">👽</span>suspance</button>
-        <button data-sound="vetrorotto.mp3"><span class="icon">💥</span>vetro rotto</button>
-        <button data-sound="urlo.mp3"><span class="icon">😱</span>urlo</button>
-        <button data-sound="pier.mp3"><span class="icon">🚨</span>pier</button>
-        <button data-sound="elefante.mp3"><span class="icon">🥁</span>elefante</button>
-        <button data-sound="painto.mp3"><span class="icon">👽</span>pianto</button>
-        <button data-sound="tosse.mp3"><span class="icon">💥</span>tosse</button>
-        <button data-sound="coutdown.mp3"><span class="icon">😱</span>countdown</button>
-    </div>
+       <!-- Input file nascosto con supporto a .opus e audio WhatsApp -->
+       <input type="file" id="fileInput" accept="audio/*, .opus, .m4a, .ogg, .wav, .mp3, .aac, .webm" multiple style="display: none;">
+   </header>
 
-    <script>
-        let currentAudio = null;
-        let currentButton = null;
-        let isDeleteMode = false;
+   <div class="soundboard" id="soundboard">
+       <!-- Pulsanti predefiniti -->
+       <button data-sound="cane.mp3" data-id="default-cane"><span class="icon">🐶</span>cane</button>
+       <button data-sound="clacson.mp3" data-id="default-clacson"><span class="icon">🎺</span>clacson</button>
+       <button data-sound="creepy.mp3" data-id="default-creepy"><span class="icon">👻</span>creepy</button>
+       <button data-sound="risata.mp3" data-id="default-risata"><span class="icon">😂</span>risata</button>
+       <button data-sound="ruggito.mp3" data-id="default-ruggito"><span class="icon">🐯</span>ruggito</button>
+       <button data-sound="sirena.mp3" data-id="default-sirena"><span class="icon">🚨</span>sirena</button>
+       <button data-sound="tamburi.mp3" data-id="default-tamburi"><span class="icon">🥁</span>tamburi</button>
+       <button data-sound="suspance.mp3" data-id="default-suspance"><span class="icon">👽</span>suspance</button>
+       <button data-sound="vetrorotto.mp3" data-id="default-vetrorotto"><span class="icon">💥</span>vetro rotto</button>
+       <button data-sound="urlo.mp3" data-id="default-urlo"><span class="icon">😱</span>urlo</button>
+       <button data-sound="pier.mp3" data-id="default-pier"><span class="icon">🚨</span>pier</button>
+       <button data-sound="elefante.mp3" data-id="default-elefante"><span class="icon">🥁</span>elefante</button>
+       <button data-sound="painto.mp3" data-id="default-painto"><span class="icon">👽</span>pianto</button>
+       <button data-sound="tosse.mp3" data-id="default-tosse"><span class="icon">💥</span>tosse</button>
+       <button data-sound="coutdown.mp3" data-id="default-coutdown"><span class="icon">😱</span>countdown</button>
+   </div>
 
-        const soundboard = document.getElementById('soundboard');
-        const addBtn = document.getElementById('addBtn');
-        const deleteModeBtn = document.getElementById('deleteModeBtn');
-        const fileInput = document.getElementById('fileInput');
+   <script>
+       let currentAudio = null;
+       let currentButton = null;
+       let isDeleteMode = false;
 
-        // Reset dello stato audio e dello stile del pulsante attivo
-        function stopCurrentAudio() {
-            if (currentAudio) {
-                currentAudio.pause();
-                currentAudio.currentTime = 0;
-            }
-            if (currentButton) {
-                currentButton.classList.remove('playing');
-            }
-            currentAudio = null;
-            currentButton = null;
-        }
+       const soundboard = document.getElementById('soundboard');
+       const addBtn = document.getElementById('addBtn');
+       const deleteModeBtn = document.getElementById('deleteModeBtn');
+       const fileInput = document.getElementById('fileInput');
 
-        // Delegazione degli eventi di click sulla soundboard
-        soundboard.addEventListener('click', (event) => {
-            const button = event.target.closest('button');
-            if (!button) return;
+       // --- GESTIONE DATABASE LOCALE (IndexedDB) PER SALVARE GLI AUDIO ALL'USCITA ---
+       function openDB() {
+           return new Promise((resolve, reject) => {
+               const request = indexedDB.open("SoundboardStorageDB", 1);
+               request.onupgradeneeded = (e) => {
+                   const db = e.target.result;
+                   if (!db.objectStoreNames.contains("sounds")) {
+                       db.createObjectStore("sounds", { keyPath: "id", autoIncrement: true });
+                   }
+               };
+               request.onsuccess = (e) => resolve(e.target.result);
+               request.onerror = (e) => reject(e.target.error);
+           });
+       }
 
-            // --- GESTIONE ELIMINAZIONE PULSANTE ---
-            if (isDeleteMode) {
-                if (currentButton === button) {
-                    stopCurrentAudio();
-                }
+       async function saveAudioToDB(name, file, icon) {
+           const db = await openDB();
+           return new Promise((resolve, reject) => {
+               const tx = db.transaction("sounds", "readwrite");
+               const store = tx.objectStore("sounds");
+               const request = store.add({ name, file, icon });
+               request.onsuccess = (e) => resolve(e.target.result);
+               request.onerror = (e) => reject(e.target.error);
+           });
+       }
 
-                const soundSrc = button.getAttribute('data-sound');
-                if (soundSrc && soundSrc.startsWith('blob:')) {
-                    URL.revokeObjectURL(soundSrc);
-                }
+       async function getAllAudiosFromDB() {
+           const db = await openDB();
+           return new Promise((resolve, reject) => {
+               const tx = db.transaction("sounds", "readonly");
+               const store = tx.objectStore("sounds");
+               const request = store.getAll();
+               request.onsuccess = (e) => resolve(e.target.result);
+               request.onerror = (e) => reject(e.target.error);
+           });
+       }
 
-                button.remove();
-                return;
-            }
+       async function deleteAudioFromDB(id) {
+           const db = await openDB();
+           return new Promise((resolve, reject) => {
+               const tx = db.transaction("sounds", "readwrite");
+               const store = tx.objectStore("sounds");
+               const request = store.delete(id);
+               request.onsuccess = () => resolve();
+               request.onerror = (e) => reject(e.target.error);
+           });
+       }
 
-            // --- GESTIONE RIPRODUZIONE AUDIO ---
-            const soundSrc = button.getAttribute('data-sound');
-            if (!soundSrc) return;
+       // --- CARICAMENTO SALVATAGGI ALL'AVVIO ---
+       async function loadSavedData() {
+           // 1. Rimuove i pulsanti predefiniti che l'utente aveva eliminato in precedenza
+           const deletedDefaults = JSON.parse(localStorage.getItem('deletedDefaults') || '[]');
+           deletedDefaults.forEach(defaultId => {
+               const btn = document.querySelector(`button[data-id="${defaultId}"]`);
+               if (btn) btn.remove();
+           });
 
-            // 1. Se lo STESSO pulsante viene premuto mentre è in riproduzione -> FERMA l'audio
-            if (currentButton === button && currentAudio && !currentAudio.paused) {
-                stopCurrentAudio();
-                return;
-            }
+           // 2. Carica dal database interno gli audio aggiunti dall'utente
+           try {
+               const savedSounds = await getAllAudiosFromDB();
+               savedSounds.forEach(item => {
+                   const audioUrl = URL.createObjectURL(item.file);
+                   createButtonInBoard(item.name, audioUrl, item.icon, item.id);
+               });
+           } catch (err) {
+               console.error("Errore nel caricamento degli audio salvati:", err);
+           }
+       }
 
-            // 2. Se c'era un altro audio attivo -> fermalo
-            stopCurrentAudio();
+       // Helper per creare visivamente un pulsante nella soundboard
+       function createButtonInBoard(name, audioUrl, iconText, dbId = null) {
+           const newButton = document.createElement('button');
+           newButton.setAttribute('data-sound', audioUrl);
+           if (dbId) {
+               newButton.setAttribute('data-db-id', dbId);
+           }
 
-            // 3. Avvia il nuovo audio
-            currentAudio = new Audio(soundSrc);
-            currentButton = button;
-            button.classList.add('playing');
+           const iconSpan = document.createElement('span');
+           iconSpan.className = 'icon';
+           iconSpan.textContent = iconText;
 
-            currentAudio.play().catch(error => {
-                console.error("Errore nella riproduzione dell'audio:", error);
-                alert(`Impossibile riprodurre il file audio. Assicurati che sia in un formato supportato dal tuo browser (MP3, OPUS, WAV, OGG, M4A).`);
-                stopCurrentAudio();
-            });
+           newButton.appendChild(iconSpan);
+           newButton.appendChild(document.createTextNode(name.toLowerCase()));
 
-            // 4. Reset alla fine della riproduzione
-            currentAudio.onended = () => {
-                stopCurrentAudio();
-            };
-        });
+           soundboard.appendChild(newButton);
+       }
 
-        // Toggle della Modalità Eliminazione
-        deleteModeBtn.addEventListener('click', () => {
-            isDeleteMode = !isDeleteMode;
+       // Ferma la riproduzione corrente
+       function stopCurrentAudio() {
+           if (currentAudio) {
+               currentAudio.pause();
+               currentAudio.currentTime = 0;
+           }
+           if (currentButton) {
+               currentButton.classList.remove('playing');
+           }
+           currentAudio = null;
+           currentButton = null;
+       }
 
-            if (isDeleteMode) {
-                deleteModeBtn.classList.add('active');
-                deleteModeBtn.textContent = '✅ Fatto';
-                soundboard.classList.add('delete-mode');
-            } else {
-                deleteModeBtn.classList.remove('active');
-                deleteModeBtn.textContent = '🗑️ Elimina';
-                soundboard.classList.remove('delete-mode');
-            }
-        });
+       // Delegazione eventi sulla soundboard
+       soundboard.addEventListener('click', async (event) => {
+           const button = event.target.closest('button');
+           if (!button) return;
 
-        // Click sul pulsante "Inserisci Audio"
-        addBtn.addEventListener('click', () => {
-            if (isDeleteMode) {
-                deleteModeBtn.click();
-            }
-            fileInput.click();
-        });
+           // --- GESTIONE ELIMINAZIONE PULSANTE ---
+           if (isDeleteMode) {
+               if (currentButton === button) {
+                   stopCurrentAudio();
+               }
 
-        // Gestione dell'inserimento dei nuovi file audio
-        fileInput.addEventListener('change', (event) => {
-            const files = event.target.files;
-            if (!files.length) return;
+               const dbId = button.getAttribute('data-db-id');
+               const defaultId = button.getAttribute('data-id');
 
-            Array.from(files).forEach(file => {
-                // Controllo estensione (include .opus per WhatsApp) e tipo MIME
-                const isValidAudio = file.type.startsWith('audio/') || 
-                                     file.name.match(/\.(mp3|wav|ogg|m4a|aac|webm|flac|opus)$/i);
+               // Se è un audio personalizzato, eliminalo da IndexedDB
+               if (dbId) {
+                   await deleteAudioFromDB(Number(dbId));
+               }
+               // Se è un audio di default, memorizzalo come eliminato su localStorage
+               else if (defaultId) {
+                   const deletedDefaults = JSON.parse(localStorage.getItem('deletedDefaults') || '[]');
+                   deletedDefaults.push(defaultId);
+                   localStorage.setItem('deletedDefaults', JSON.stringify(deletedDefaults));
+               }
 
-                if (!isValidAudio) {
-                    alert(`Il file "${file.name}" non sembra un formato audio supportato.`);
-                    return;
-                }
+               const soundSrc = button.getAttribute('data-sound');
+               if (soundSrc && soundSrc.startsWith('blob:')) {
+                   URL.revokeObjectURL(soundSrc);
+               }
 
-                const audioUrl = URL.createObjectURL(file);
-                const fileName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+               button.remove();
+               return;
+           }
 
-                const newButton = document.createElement('button');
-                newButton.setAttribute('data-sound', audioUrl);
+           // --- GESTIONE RIPRODUZIONE AUDIO ---
+           const soundSrc = button.getAttribute('data-sound');
+           if (!soundSrc) return;
 
-                const iconSpan = document.createElement('span');
-                iconSpan.className = 'icon';
-                
-                // Se è un file di WhatsApp usa un'icona dedicata, altrimenti la nota musicale
-                iconSpan.textContent = file.name.toLowerCase().endsWith('.opus') ? '🎙️' : '🎵';
+           if (currentButton === button && currentAudio && !currentAudio.paused) {
+               stopCurrentAudio();
+               return;
+           }
 
-                newButton.appendChild(iconSpan);
-                newButton.appendChild(document.createTextNode(fileName.toLowerCase()));
+           stopCurrentAudio();
 
-                soundboard.appendChild(newButton);
-            });
+           currentAudio = new Audio(soundSrc);
+           currentButton = button;
+           button.classList.add('playing');
 
-            fileInput.value = '';
-        });
-    </script>
+           currentAudio.play().catch(error => {
+               console.error("Errore nella riproduzione:", error);
+               alert(`Impossibile riprodurre l'audio.`);
+               stopCurrentAudio();
+           });
+
+           currentAudio.onended = () => {
+               stopCurrentAudio();
+           };
+       });
+
+       // Toggle della Modalità Eliminazione
+       deleteModeBtn.addEventListener('click', () => {
+           isDeleteMode = !isDeleteMode;
+
+           if (isDeleteMode) {
+               deleteModeBtn.classList.add('active');
+               deleteModeBtn.textContent = '✅ Fatto';
+               soundboard.classList.add('delete-mode');
+           } else {
+               deleteModeBtn.classList.remove('active');
+               deleteModeBtn.textContent = '🗑️ Elimina';
+               soundboard.classList.remove('delete-mode');
+           }
+       });
+
+       // Click sul pulsante "Inserisci Audio"
+       addBtn.addEventListener('click', () => {
+           if (isDeleteMode) {
+               deleteModeBtn.click();
+           }
+           fileInput.click();
+       });
+
+       // Gestione inserimento e salvataggio permanente dei nuovi file audio
+       fileInput.addEventListener('change', (event) => {
+           const files = event.target.files;
+           if (!files.length) return;
+
+           Array.from(files).forEach(async (file) => {
+               const isValidAudio = file.type.startsWith('audio/') ||
+                                    file.name.match(/\.(mp3|wav|ogg|m4a|aac|webm|flac|opus)$/i);
+
+               if (!isValidAudio) {
+                   alert(`Il file "${file.name}" non sembra un formato audio supportato.`);
+                   return;
+               }
+
+               const fileName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+               const iconText = file.name.toLowerCase().endsWith('.opus') ? '🎙️' : '🎵';
+
+               try {
+                   // Salva il file fisico direttamente nel DB del browser
+                   const dbId = await saveAudioToDB(fileName, file, iconText);
+
+                   // Crea l'URL temporaneo per la sessione corrente
+                   const audioUrl = URL.createObjectURL(file);
+
+                   // Aggiunge il pulsante alla schermata
+                   createButtonInBoard(fileName, audioUrl, iconText, dbId);
+               } catch (err) {
+                   console.error("Errore nel salvataggio del file:", err);
+                   alert("Impossibile salvare il file in locale.");
+               }
+           });
+
+           fileInput.value = '';
+       });
+
+       // Avvia il caricamento dei salvataggi quando la pagina si apre
+       document.addEventListener('DOMContentLoaded', loadSavedData);
+   </script>
 </body>
 </html>
